@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,36 @@ final class ShopController extends AbstractController
         return $this->render('shop/index.html.twig',
         [
             'randomProducts' => $randomProducts,
+        ]);
+    }
+
+    #[Route("/shop/by_cat/{id}/{page}", name: "app_by_cat")]
+    public function byCat(CategoryRepository $catRepo, int $id, int $page): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
+        $cat = $catRepo->find($id);
+
+        $products = [];
+
+        for($i = 0 ; $i < count($cat->getProducts()) ; $i++)
+        {
+            if($i >= ($page - 1) * $_ENV["LIMIT_PAGES"] && $i < $page * $_ENV["LIMIT_PAGES"])
+            {
+                $products[] = $cat->getProducts()[$i];
+            }
+        }
+
+        $nbPages = ceil(count($cat->getProducts()) / $_ENV["LIMIT_PAGES"]);
+
+        return $this->render("shop/byCat.html.twig",
+        [
+            "cat" => $cat,
+            "products" => $products,
+            "nbPages" => $nbPages
         ]);
     }
 }

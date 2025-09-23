@@ -1,0 +1,7 @@
+<div style="background-color: rgb(128, 0, 255)">
+    <div style="display: flex; flex-direction: column;">
+        {% for cat in allCategories %}
+            <a href="{{ url('app_by_cat', {id: cat.id, page: 1}) }}">{{ cat.name }}</a>
+        {% endfor %}
+    </div>
+</div>
