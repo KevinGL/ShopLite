@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue {{ app.user.username }} !{% endblock %}
+
+{% block body %}
+
+<div>
+    <h1>Recherche de "{{words}}"</h1>
+
+    {% for i in 1..nbPages %}
+        <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
+    {% endfor %}
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-evenly;">
+        {% for product in products %}
+            <div>
+                <h2>{{ product.name }}</h2>
+                <img src="{{ product.image }}" alt="{{ product.name }}" width="500">
+            </div>
+        {% endfor %}
+    </div>
+
+    {% for i in 1..nbPages %}
+        <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
+    {% endfor %}
+</div>
+{% endblock %}

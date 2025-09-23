@@ -8,6 +8,9 @@
         {% endblock %}
     </head>
     <body>
+        {% if app.user %}
+            {% include("navbar.html.twig") %}
+        {% endif %}
         <div style="display: flex; flex-direction: row;">
             {% if app.user %}
                 {% include("sidebar.html.twig") %}

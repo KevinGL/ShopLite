@@ -59,4 +59,27 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByWords(array $words, int $page, int &$nbPages): array
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        $orX = $qb->expr()->orX();
+
+        foreach ($words as $i => $word)
+        {
+            $param = ':word' . $i;
+            $orX->add("p.name LIKE $param OR p.description LIKE $param");
+            $qb->setParameter($param, '%' . $word . '%');
+        }
+
+        $products = $qb->where($orX)->getQuery()->getResult();
+        $nbPages = ceil(count($products) / $_ENV["LIMIT_PAGES"]);
+
+        return $qb->where($orX)
+            ->setFirstResult(($page - 1) * $_ENV["LIMIT_PAGES"])
+            ->setMaxResults($_ENV["LIMIT_PAGES"])
+            ->getQuery()
+            ->getResult();
+    }
 }
