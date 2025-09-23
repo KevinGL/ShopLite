@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bienvenue {{ app.user.username }} !{% endblock %}
+{% block title %}Recherche de "{{words}}"{% endblock %}
 
 {% block body %}
 
@@ -16,6 +16,9 @@
             <div>
                 <h2>{{ product.name }}</h2>
                 <img src="{{ product.image }}" alt="{{ product.name }}" width="500">
+                <div>
+                    <a href="{{ url('view_product', {'id': product.id}) }}">Voir</a>
+                </div>
             </div>
         {% endfor %}
     </div>

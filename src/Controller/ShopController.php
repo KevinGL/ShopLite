@@ -61,6 +61,11 @@ final class ShopController extends AbstractController
     #[Route("/shop/search/{page}", name: "app_by_search")]
     public function search(Request $req, ProductRepository $repo, int $page): Response
     {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
         $nbPages = 0;
         
         $products = $repo->findByWords(explode(" ", $req->get("words")), $page, $nbPages);
@@ -70,6 +75,22 @@ final class ShopController extends AbstractController
             "products" => $products,
             "words" => $req->get("words"),
             "nbPages" => $nbPages
+        ]);
+    }
+
+    #[Route("/shop/product/{id}", name: "view_product")]
+    public function viewProduct(ProductRepository $repo, int $id): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+
+        $product = $repo->find($id);
+
+        return $this->render("shop/view_product.html.twig",
+        [
+            "product" => $product
         ]);
     }
 }
