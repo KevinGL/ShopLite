@@ -66,6 +66,9 @@ final class ShopController extends AbstractController
             return $this->redirectToRoute("app_home");
         }
         
+        $session = $req->getSession();
+        $session->set("aa", "bb");
+        
         $nbPages = 0;
         
         $products = $repo->findByWords(explode(" ", $req->get("words")), $page, $nbPages);
@@ -92,5 +95,29 @@ final class ShopController extends AbstractController
         [
             "product" => $product
         ]);
+    }
+
+    #[Route("/api/cart/add/{id}", name: "api_add_cart")]
+    public function addCart(Request $req, ProductRepository $repo, int $id): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->json(["message" => "Non authentifié"], 401);
+        }
+        
+        $session = $req->getSession();
+        $cart = $session->get("cart") ?? [];
+
+        $product = $repo->find($id);
+        if (!$product)
+        {
+            return $this->json(["message" => "Produit introuvable"], 404);
+        }
+
+        $cart[$id] = ($cart[$id] ?? 0) + 1;
+
+        $session->set("cart", $cart);
+
+        return $this->json(["message" => "Ajouté au panier !", "count" => count($cart)], 200);
     }
 }

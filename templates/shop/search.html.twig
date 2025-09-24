@@ -7,24 +7,31 @@
 <div>
     <h1>Recherche de "{{words}}"</h1>
 
-    {% for i in 1..nbPages %}
-        <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
-    {% endfor %}
+    {% if products | length == 0 %}
+        <div>
+            Aucun résultat
+        </div>
 
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-evenly;">
-        {% for product in products %}
-            <div>
-                <h2>{{ product.name }}</h2>
-                <img src="{{ product.image }}" alt="{{ product.name }}" width="500">
-                <div>
-                    <a href="{{ url('view_product', {'id': product.id}) }}">Voir</a>
-                </div>
-            </div>
+    {% else %}
+        {% for i in 1..nbPages %}
+            <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
         {% endfor %}
-    </div>
 
-    {% for i in 1..nbPages %}
-        <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
-    {% endfor %}
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-evenly;">
+            {% for product in products %}
+                <div>
+                    <h2>{{ product.name }}</h2>
+                    <img src="{{ product.image }}" alt="{{ product.name }}" width="500">
+                    <div>
+                        <a href="{{ url('view_product', {'id': product.id}) }}">Voir</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% for i in 1..nbPages %}
+            <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

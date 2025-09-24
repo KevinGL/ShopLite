@@ -10,6 +10,29 @@
     <p>
         {{ product.description }}
     </p>
-    <button>Ajouter au panier</button>
+    <button id="add_cart">Ajouter au panier</button>
+
+    <div id="modal" style="display:none;">
+        <div id="message"></div>
+    </div>
 </div>
+
+<script>
+    $("#add_cart").click(() =>
+    {
+        $.get("/api/cart/add/{{ product.id }}", (res) =>
+        {
+            //console.log(res);
+
+            $("#modal").show();
+            $("#message").text(res.message);
+
+            setTimeout(() =>
+            {
+                $("#modal").hide();
+            }, 5000);
+        });
+    });
+</script>
+
 {% endblock %}
