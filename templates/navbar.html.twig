@@ -1,4 +1,5 @@
 <nav style="display: flex">
+    <a href="{{ url('app_shop') }}">ShopLite</a>
     <form action="{{ url('app_by_search', {'page': 1}) }}" method="get">
         <input type="text" name="words" />
         <input type="submit"/>
@@ -6,6 +7,7 @@
     <div id="cart">
         <img src="/images/Cart.png" alt="cart" width="20" />
         <span id="count_cart">0</span>
+        <a href="{{ url('view_cart') }}">Voir mon panier</a>
     </div>
 </nav>
 

@@ -18,14 +18,10 @@
 </div>
 
 <script>
-    //console.log(parseInt($("#count_cart").text()));
-
     $("#add_cart").click(() =>
     {
         $.get("/api/cart/add/{{ product.id }}", (res) =>
         {
-            //console.log(res);
-
             $("#modal").show();
             $("#message").text(res.message);
 

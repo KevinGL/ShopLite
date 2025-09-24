@@ -47,4 +47,62 @@ final class CartController extends AbstractController
 
         return $this->json(["message" => "Ajouté au panier !", "success" => true, "count" => count($cart)], 200);
     }
+
+    #[Route("/cart/view", name: "view_cart")]
+    public function view(Request $req, ProductRepository $repo): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
+        $session = $req->getSession();
+
+        $cart = $session->get("cart") ?? [];
+
+        $products = [];
+
+        foreach($cart as $key => $value)
+        {
+            $product = $repo->find($key);
+            $product->count = $value;
+
+            $products[] = $product;
+        }
+
+        return $this->render("cart/view.html.twig", ["products" => $products]);
+    }
+
+    #[Route("/cart/delete/{id}", name: "cart_delete")]
+    public function delete(Request $req, ProductRepository $repo, int $id): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
+        $session = $req->getSession();
+
+        $cart = $session->get("cart") ?? [];
+
+        if (isset($cart[$id]))
+        {
+            $cart[$id]--;
+
+            if ($cart[$id] <= 0)
+            {
+                unset($cart[$id]);
+            }
+        }
+        else
+        {
+            $this->addFlash("error", "Produit introuvable");
+
+            return $this->redirectToRoute("view_cart");
+        }
+
+        $session->set("cart", $cart);
+
+        return $this->redirectToRoute("view_cart");
+    }
 }

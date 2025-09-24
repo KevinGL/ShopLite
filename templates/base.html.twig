@@ -12,6 +12,10 @@
     <body>
         {% if app.user %}
             {% include("navbar.html.twig") %}
+
+            {% for messages in app.flashes %}
+                {{ messages | join("\n") }}
+            {% endfor %}
         {% endif %}
         <div style="display: flex; flex-direction: row;">
             {% if app.user %}

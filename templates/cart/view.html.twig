@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Votre panier{% endblock %}
+
+{% block body %}
+    <div style="display: flex; flex-direction: column;">
+        {% for prod in products %}
+            <div>
+                <h2>{{ prod.name }}</h2>
+                <img src="{{ prod.image }}" alt="{{ prod.name }}">
+                <p>
+                    {{ prod.description }}
+                </p>
+
+                <div>{{ prod.count }}x</div>
+                <button id="{{ prod.id }}" class="delete">
+                    <img src="/images/Trash.png" alt="Supprimer" width="20" />
+                </button>
+            </div>
+        {% endfor %}
+
+        {% if products | length > 0 %}
+            <button>Commander</button>
+        {% else %}
+            <div>Votre panier est vide</div>
+        {% endif %}
+    </div>
+
+    <script>
+        const buttons_delete = Array.from($(".delete"));
+
+        buttons_delete.map((b) =>
+        {
+            $("#" + b.id).click(() =>
+            {
+                window.location.href = "/cart/delete/" + b.id;
+            });
+        });
+    </script>
+{% endblock %}
