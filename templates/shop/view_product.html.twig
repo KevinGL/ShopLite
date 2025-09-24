@@ -18,6 +18,8 @@
 </div>
 
 <script>
+    //console.log(parseInt($("#count_cart").text()));
+
     $("#add_cart").click(() =>
     {
         $.get("/api/cart/add/{{ product.id }}", (res) =>
@@ -31,6 +33,11 @@
             {
                 $("#modal").hide();
             }, 5000);
+
+            if(res.success)
+            {
+                $("#count_cart").text(res.count);
+            }
         });
     });
 </script>

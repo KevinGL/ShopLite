@@ -1,4 +1,20 @@
-<form action="{{ url('app_by_search', {'page': 1}) }}" method="get">
-    <input type="text" name="words" />
-    <input type="submit"/>
-</form>
+<nav style="display: flex">
+    <form action="{{ url('app_by_search', {'page': 1}) }}" method="get">
+        <input type="text" name="words" />
+        <input type="submit"/>
+    </form>
+    <div id="cart">
+        <img src="/images/Cart.png" alt="cart" width="20" />
+        <span id="count_cart">0</span>
+    </div>
+</nav>
+
+<script>
+    $.get("/api/cart/get_count", (res) =>
+    {
+        if(res.success)
+        {
+            $("#count_cart").text(res.message);
+        }
+    });
+</script>
