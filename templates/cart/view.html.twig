@@ -4,6 +4,8 @@
 
 {% block body %}
     <div style="display: flex; flex-direction: column;">
+        {% set price = 0.0 %}
+
         {% for prod in products %}
             <div>
                 <h2>{{ prod.name }}</h2>
@@ -11,30 +13,29 @@
                 <p>
                     {{ prod.description }}
                 </p>
+                <a href="{{ url('view_product', {'id': prod.id}) }}">Voir</a>
 
                 <div>{{ prod.count }}x</div>
-                <button id="{{ prod.id }}" class="delete">
+                <a href="/cart/delete/{{ prod.id }}">
                     <img src="/images/Trash.png" alt="Supprimer" width="20" />
-                </button>
+                </a>
+                <a href="/cart/dec/{{ prod.id }}">
+                    -
+                </a>
+                <a href="/cart/inc/{{ prod.id }}">
+                    +
+                </a>
             </div>
+
+            {% set price = price + prod.count * prod.price %}
         {% endfor %}
 
         {% if products | length > 0 %}
+            Total : {{ price }} €
+            <a href="{{ url('cart_erase') }}">Vider mon panier</a>
             <button>Commander</button>
         {% else %}
             <div>Votre panier est vide</div>
         {% endif %}
     </div>
-
-    <script>
-        const buttons_delete = Array.from($(".delete"));
-
-        buttons_delete.map((b) =>
-        {
-            $("#" + b.id).click(() =>
-            {
-                window.location.href = "/cart/delete/" + b.id;
-            });
-        });
-    </script>
 {% endblock %}

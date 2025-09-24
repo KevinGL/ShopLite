@@ -74,7 +74,35 @@ final class CartController extends AbstractController
     }
 
     #[Route("/cart/delete/{id}", name: "cart_delete")]
-    public function delete(Request $req, ProductRepository $repo, int $id): Response
+    public function delete(Request $req, int $id): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
+        $session = $req->getSession();
+
+        $cart = $session->get("cart") ?? [];
+
+        if (isset($cart[$id]))
+        {
+            unset($cart[$id]);
+        }
+        else
+        {
+            $this->addFlash("error", "Produit introuvable");
+
+            return $this->redirectToRoute("view_cart");
+        }
+
+        $session->set("cart", $cart);
+
+        return $this->redirectToRoute("view_cart");
+    }
+
+    #[Route("/cart/dec/{id}", name: "cart_dec")]
+    public function dec(Request $req, int $id): Response
     {
         if(!$this->getUser())
         {
@@ -102,6 +130,40 @@ final class CartController extends AbstractController
         }
 
         $session->set("cart", $cart);
+
+        return $this->redirectToRoute("view_cart");
+    }
+
+    #[Route("/cart/inc/{id}", name: "cart_inc")]
+    public function inc(Request $req, int $id): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
+        $session = $req->getSession();
+
+        $cart = $session->get("cart") ?? [];
+
+        $cart[$id]++;
+
+        $session->set("cart", $cart);
+
+        return $this->redirectToRoute("view_cart");
+    }
+
+    #[Route("/cart/erase", name: "cart_erase")]
+    public function erase(Request $req): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
+        $session = $req->getSession();
+
+        $session->set("cart", []);
 
         return $this->redirectToRoute("view_cart");
     }
