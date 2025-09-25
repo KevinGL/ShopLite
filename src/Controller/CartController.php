@@ -41,6 +41,11 @@ final class CartController extends AbstractController
             return $this->json(["message" => "Produit introuvable", "success" => false], 404);
         }
 
+        if($product->getNbCopies() <= 0)
+        {
+            return $this->json(["message" => "Ce produit n'est plus disponible", "success" => false], 404);
+        }
+
         $cart[$id] = ($cart[$id] ?? 0) + 1;
 
         $session->set("cart", $cart);

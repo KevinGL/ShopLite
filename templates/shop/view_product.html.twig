@@ -11,7 +11,12 @@
         {{ product.description }}
     </p>
     <div>{{ product.price }} €</div>
-    <button id="add_cart">Ajouter au panier</button>
+    
+    {% if product.nbCopies > 0 %}
+        <button id="add_cart">Ajouter au panier</button>
+    {% else %}
+        <div>Ce produit n'est plus disponible</div>
+    {% endif %}
 
     <div id="modal" style="display:none;">
         <div id="message"></div>

@@ -33,7 +33,7 @@
         {% if products | length > 0 %}
             Total : {{ price }} €
             <a href="{{ url('cart_erase') }}">Vider mon panier</a>
-            <button>Commander</button>
+            <a href="{{ url('add_order') }}">Valider ma commande</a>
         {% else %}
             <div>Votre panier est vide</div>
         {% endif %}

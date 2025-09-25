@@ -46,6 +46,13 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
+        $session = $request->getSession();
+        
+        if($session->get("cart"))
+        {
+            $session->set("cart", []);
+        }
+
         return new RedirectResponse($this->urlGenerator->generate('app_shop'));
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
