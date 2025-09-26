@@ -13,7 +13,7 @@
                 {% if order.goAt is null %}
                     En cours de préparation
                 {% elseif order.goAt is not null and order.deliveredAt is null %}
-                    En cours de livraison
+                    Expédiée
                 {% elseif order.deliveredAt is not null %}
                     Livrée
                 {% endif %}

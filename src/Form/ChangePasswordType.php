@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ChangePasswordType extends AbstractType
 {
@@ -19,13 +20,17 @@ class ChangePasswordType extends AbstractType
             [
                 'label' => 'Ancien mot de passe',
                 'mapped' => false,
+                "constraints" =>
+                [
+                    new NotBlank(['message' => 'Veuillez entrer un nom d\'utilisateur'])
+                ]
             ])
             ->add('new_password', PasswordType::class,
             [
                 'label' => 'Nouveau mot de passe',
                 'mapped' => false,
                 'constraints' => [
-                    new Assert\NotBlank([
+                    new NotBlank([
                         'message' => 'Veuillez entrer un mot de passe',
                     ]),
                     new Assert\Length([

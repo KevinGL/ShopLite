@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\ChangePasswordType;
+use App\Form\DeleteProfileType;
 use App\Form\UserType;
 use App\Repository\OrderRepository;
 use App\Repository\UserRepository;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class ProfileController extends AbstractController
 {
@@ -23,7 +25,7 @@ final class ProfileController extends AbstractController
     }
     
     #[Route('/profile', name: 'app_profile')]
-    public function index(Request $req, OrderRepository $orderRepo, UserRepository $userRepo, EntityManagerInterface $em): Response
+    public function index(Request $req, TokenStorageInterface $tokenStorage, OrderRepository $orderRepo, UserRepository $userRepo, EntityManagerInterface $em): Response
     {
         if(!$this->getUser())
         {
@@ -75,11 +77,46 @@ final class ProfileController extends AbstractController
                 $this->addFlash("success", "Mot de passe mis à jour");
             }
         }
+
+        $deleteProfileForm = $this->createForm(DeleteProfileType::class);
+        $deleteProfileForm->handleRequest($req);
+
+        if($deleteProfileForm->isSubmitted() && $deleteProfileForm->isValid())
+        {
+            $password = $deleteProfileForm->get("password")->getData();
+            $passwordConfirm = $deleteProfileForm->get("confirm_password")->getData();
+            
+            if($password != $passwordConfirm)
+            {
+                $this->addFlash("error", "Les mots de passe ne concordent pas");
+            }
+
+            else            
+            if(!password_verify($password, $user->getPassword()) || !password_verify($passwordConfirm, $user->getPassword()))
+            {
+                $this->addFlash("error", "Mauvais mot de passe entré");
+            }
+            
+            else
+            {
+                $user = $this->getUser();
+
+                $tokenStorage->setToken(null);
+                $session = $req->getSession();
+                $session->invalidate();
+
+                $em->remove($user);
+                $em->flush();
+
+                return $this->redirectToRoute("app_home");
+            }
+        }
         
         return $this->render('profile/index.html.twig',
         [
             "profileForm" => $profileForm,
             "passwordForm" => $passwordForm,
+            "deleteProfileForm" => $deleteProfileForm,
             "orders" => $orders
         ]);
     }

@@ -19,15 +19,43 @@
         </div>
 
         <div>
-            <h1>Historique de vos commandes</h1>
+            <button id="delete">Supprimer mon profil</button>
+        </div>
 
-            <div>
-                {% for order in orders %}
-                    <div>
-                        <a href="{{ url('view_order', {'id': order.id}) }}">{{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}</a>
-                    </div>
-                {% endfor %}
-            </div>
+        <div>
+            {% if orders | length > 0 %}
+                <h1>Historique de vos commandes</h1>
+
+                <div>
+                    {% for order in orders %}
+                        <div>
+                            <a href="{{ url('view_order', {'id': order.id}) }}">{{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div>
+                    <h1>Vous n'avez pas encore de commandes</h1>
+                </div>
+            {% endif %}
         </div>
     </div>
+
+    <div id="modal" hidden>
+        Veuillez entrer votre mot de passe pour supprimer votre profil
+        {{ form(deleteProfileForm) }}
+        <button id="abort">Annuler</button>
+    </div>
+
+    <script>
+        $("#delete").click(() =>
+        {
+            $("#modal").show();
+        });
+
+        $("#abort").click(() =>
+        {
+            $("#modal").hide();
+        });
+    </script>
 {% endblock %}
