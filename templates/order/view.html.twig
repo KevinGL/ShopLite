@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Votre panier{% endblock %}
+
+{% block body %}
+    <div style="display: flex; flex-direction: column;">
+        <div>
+            <h1>Commande passée le {{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}</h1>
+
+            <h2>
+                Statut :
+
+                {% if order.goAt is null %}
+                    En cours de préparation
+                {% elseif order.goAt is not null and order.deliveredAt is null %}
+                    En cours de livraison
+                {% elseif order.deliveredAt is not null %}
+                    Livrée
+                {% endif %}
+            </h2>
+
+            <h2>Liste des produits</h2>
+
+            {% set totalPrice = 0 %}
+
+            <ul>
+                {% for item in order.orderItems %}
+                    <li><a href="{{ url('view_product', {'id': item.product.id}) }}">{{ item.product.name }}</a></li>
+                    {% set totalPrice = totalPrice + item.unitPrice * item.quantity %}
+                {% endfor %}
+            </ul>
+
+            <h3>{{ totalPrice }} €</h3>
+        </div>
+
+        <a href="{{ url('app_profile') }}">Retour sur votre profil</a>
+    </div>
+{% endblock %}

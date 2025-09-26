@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue dans votre espace !{% endblock %}
+
+{% block body %}
+    <div style="display: flex; flex-direction: column;">
+        <div>
+            <h1>Vos coordonnées</h1>
+            {{ form(profileForm) }}
+        </div>
+
+        <div>
+            <h1>Mettre à jour votre mot de passe</h1>
+            {{ form(passwordForm) }}
+        </div>
+
+        <div>
+            <a href="{{ url('app_logout') }}">Se déconnecter</a>
+        </div>
+
+        <div>
+            <h1>Historique de vos commandes</h1>
+
+            <div>
+                {% for order in orders %}
+                    <div>
+                        <a href="{{ url('view_order', {'id': order.id}) }}">{{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

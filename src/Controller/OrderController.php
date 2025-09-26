@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Form\OrderType;
+use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,10 +33,13 @@ final class OrderController extends AbstractController
         
         $session = $req->getSession();
         $cart = $session->get("cart");
+        $products = [];
 
         foreach($cart as $key => $value)
         {
             $product = $repo->find($key);
+
+            $products[] = ["product" => $product, "quantity" => $value];
 
             $orderItem = new OrderItem();
             $orderItem->setProduct($product)
@@ -51,9 +55,15 @@ final class OrderController extends AbstractController
         if($form->isSubmitted() && $form->isValid())
         {
             $em->persist($order);
-            $em->flush();
 
             $session->set("cart", []);
+
+            foreach($products as $product)
+            {
+                $product["product"]->setNbCopies($product["product"]->getNbCopies() - $product["quantity"]);
+            }
+
+            $em->flush();
 
             $this->addFlash("success", "Commande passée !");
 
@@ -62,7 +72,24 @@ final class OrderController extends AbstractController
         
         return $this->render('order/add.html.twig',
         [
-            "form" => $form
+            "form" => $form,
+            "products" => $products
+        ]);
+    }
+
+    #[Route("/order/view/{id}", name: "view_order")]
+    public function view(OrderRepository $repo, int $id): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+        
+        $order = $repo->find($id);
+        
+        return $this->render('order/view.html.twig',
+        [
+            "order" => $order
         ]);
     }
 }
