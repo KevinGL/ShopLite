@@ -2,19 +2,19 @@
 
 namespace App\Controller;
 
-use App\Entity\Product;
-use App\Form\ProductType;
-use App\Repository\ProductRepository;
+use App\Entity\Category;
+use App\Form\CategoryType;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class ProductController extends AbstractController
+final class CategoryController extends AbstractController
 {
-    #[Route('/products/{page}', name: 'app_products', requirements: ['page' => '\d+'])]
-    public function index(ProductRepository $repo, int $page): Response
+    #[Route('/category', name: 'app_category')]
+    public function index(CategoryRepository $repo): Response
     {
         if(!$this->getUser())
         {
@@ -26,20 +26,16 @@ final class ProductController extends AbstractController
             $this->addFlash("error", "Cette page est réservée aux admins");
             return $this->redirectToRoute("app_shop");
         }
-
-        $nbPages = 0;
-
-        $products = $repo->findByPage($page, $nbPages);
         
-        return $this->render('product/index.html.twig',
+        $categories = $repo->findAll();
+        
+        return $this->render('category/index.html.twig',
         [
-            'products' => $products,
-            'page' => $page,
-            'nbPages' => $nbPages
+            'categories' => $categories
         ]);
     }
 
-    #[Route("/products/add", name: "add_product")]
+    #[Route("/category/add", name: "add_category")]
     public function add(Request $req, EntityManagerInterface $em): Response
     {
         if(!$this->getUser())
@@ -52,29 +48,63 @@ final class ProductController extends AbstractController
             $this->addFlash("error", "Cette page est réservée aux admins");
             return $this->redirectToRoute("app_shop");
         }
-        
-        $product = new Product();
 
-        $form = $this->createForm(ProductType::class, $product);
+        $category = new Category();
+
+        $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($req);
 
         if($form->isSubmitted() && $form->isValid())
         {
-            $em->persist($product);
+            $em->persist($category);
             $em->flush();
 
-            $this->addFlash("success", "Produit ajouté");
-            return $this->redirectToRoute("app_products", ["page" => 1]);
+            $this->addFlash("success", "Catégorie ajoutée");
+            return $this->redirectToRoute("app_category");
         }
 
-        return $this->render("product/add.html.twig",
+        return $this->render("category/add.html.twig",
         [
             "form" => $form
         ]);
     }
 
-    #[Route("/products/edit/{id}", name: "edit_product")]
-    public function edit(Request $req, ProductRepository $repo, int $id, EntityManagerInterface $em): Response
+    #[Route("/category/edit/{id}", name: "edit_category")]
+    public function edit(Request $req, CategoryRepository $repo, int $id, EntityManagerInterface $em): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+
+        if(!in_array("ROLE_ADMIN", $this->getUser()->getRoles()))
+        {
+            $this->addFlash("error", "Cette page est réservée aux admins");
+            return $this->redirectToRoute("app_shop");
+        }
+
+        $category = $repo->find($id);
+
+        $form = $this->createForm(CategoryType::class, $category);
+        $form->handleRequest($req);
+
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $em->persist($category);
+            $em->flush();
+
+            $this->addFlash("success", "Catégorie mise à jour");
+            return $this->redirectToRoute("app_category");
+        }
+
+        return $this->render("category/add.html.twig",
+        [
+            "form" => $form
+        ]);
+    }
+
+    #[Route("/category/delete/{id}", name: "delete_cat")]
+    public function delete(CategoryRepository $repo, int $id, EntityManagerInterface $em): Response
     {
         if(!$this->getUser())
         {
@@ -87,53 +117,13 @@ final class ProductController extends AbstractController
             return $this->redirectToRoute("app_shop");
         }
         
-        $product = $repo->find($id);
+        $cat = $repo->find($id);
 
-        $form = $this->createForm(ProductType::class, $product);
-        $form->handleRequest($req);
-
-        if($form->isSubmitted() && $form->isValid())
-        {
-            $em->persist($product);
-            $em->flush();
-
-            $this->addFlash("success", "Produit mis à jour");
-            return $this->redirectToRoute("app_products", ["page" => 1]);
-        }
-
-        return $this->render("product/edit.html.twig",
-        [
-            "form" => $form
-        ]);
-    }
-
-    #[Route("/products/delete/{id}", name: "delete_product")]
-    public function delete(ProductRepository $repo, int $id, EntityManagerInterface $em): Response
-    {
-        if(!$this->getUser())
-        {
-            return $this->redirectToRoute("app_home");
-        }
-
-        if(!in_array("ROLE_ADMIN", $this->getUser()->getRoles()))
-        {
-            $this->addFlash("error", "Cette page est réservée aux admins");
-            return $this->redirectToRoute("app_shop");
-        }
-        
-        $product = $repo->find($id);
-
-        foreach ($product->getCategories() as $category)
-        {
-            $product->removeCategory($category);
-        }
-
-        $em->flush();
-        $em->remove($product);
+        $em->remove($cat);
         $em->flush();
 
-        $this->addFlash("success", "Produit supprimé");
+        $this->addFlash("success", "Catégorie supprimée");
 
-        return $this->redirectToRoute("app_products", ["page" => 1]);
+        return $this->redirectToRoute("app_category");
     }
 }
