@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un produit{% endblock %}
+
+{% block body %}
+    <div>
+        <h1>Ajouter un produit</h1>
+
+        {{ form_start(form) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.image) }}
+            <input type="file" id="fileUpload">
+            {{ form_row(form.price) }}
+            {{ form_row(form.description) }}
+            {{ form_row(form.nbCopies) }}
+            {{ form_row(form.categories) }}
+        {{ form_end(form) }}
+    </div>
+
+    <script>
+        $("#fileUpload").on("change", function()
+        {
+            var file = this.files[0];
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "ShopLite");
+
+            $.ajax({
+                url: "https://api.cloudinary.com/v1_1/druglzlvw/image/upload",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res)
+                {
+                    //console.log("Upload success: ", res.secure_url);
+                    $("#product_image").val(res.secure_url);
+                },
+                error: function(err)
+                {
+                    console.error("Upload error: ", err);
+                }
+            });
+        });
+    </script>
+{% endblock %}

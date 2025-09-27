@@ -82,4 +82,19 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByPage(int $page, int &$nbPages): array
+    {
+        $alls = $this->createQueryBuilder("p")
+            ->getQuery()
+            ->getResult();
+        
+        $nbPages = ceil(count($alls) / $_ENV["LIMIT_PAGES"]);
+        
+        return $this->createQueryBuilder("p")
+            ->setFirstResult(($page - 1) * $_ENV["LIMIT_PAGES"])
+            ->setMaxResults($_ENV["LIMIT_PAGES"])
+            ->getQuery()
+            ->getResult();
+    }
 }

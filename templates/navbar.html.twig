@@ -12,6 +12,12 @@
     <div>
         <a href="{{ url('app_profile') }}"><img src="/images/Profile.png" alt="profile" width="20" /></a>
     </div>
+
+    {% if "ROLE_ADMIN" in app.user.roles %}
+        <div>
+            <a href="{{ url('app_products', {'page': 1}) }}">Gérer les produits</a>
+        </div>
+    {% endif %}
 </nav>
 
 <script>
