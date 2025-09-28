@@ -30,6 +30,9 @@
     </div>
 
     <script>
+
+    const selectedValues = $("#select_products").val();
+    $("#order_admin_selectProducts").val(selectedValues);
     
     $("#search_product").on("input", (e) =>
     {
@@ -48,6 +51,9 @@
                     {
                         const o = new Option(p.name, p.id);
                         $("#select_products").append(o);
+
+                        const selectedValues = $("#select_products").val();
+                        $("#order_admin_selectProducts").val(selectedValues);
                     }
                 });
             }

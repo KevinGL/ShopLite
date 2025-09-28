@@ -30,6 +30,8 @@ class OrderAdminType extends AbstractType
                     new NotBlank(['message' => 'Veuillez entrer une date'])
                 ]
             ])
+            ->add('goAt', DateType::class, ["required" => false])
+            ->add('deliveredAt', DateType::class, ["required" => false])
             ->add('userInput', TextType::class,
             [
                 "attr" => ["list" => "list_users"],
