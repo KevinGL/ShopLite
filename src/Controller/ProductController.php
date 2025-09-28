@@ -136,4 +136,22 @@ final class ProductController extends AbstractController
 
         return $this->redirectToRoute("app_products", ["page" => 1]);
     }
+
+    #[Route("/api/products/search_by_word/{words}", name: "api_search_product")]
+    public function searchByWord(ProductRepository $repo, string $words): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->json(["message" => "Not authenticated"], 401);
+        }
+
+        if(!in_array("ROLE_ADMIN", $this->getUser()->getRoles()))
+        {
+            return $this->json(["message" => "Not admin"], 403);
+        }
+
+        $products = $repo->findByWordsNoPage(explode(" ", $words));
+
+        return $this->json(["message" => $products], 200, [], ['groups' => 'product_search']);
+    }
 }

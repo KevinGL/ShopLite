@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des commandes{% endblock %}
+
+{% block body %}
+    <div>
+        <div>
+            {% for i in 1..nbPages %}
+                <a href="{{ url('orders', {'page': i}) }}">{{ i }}</a>
+            {% endfor %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Client</th>
+                        <th>Date de commande</th>
+                        <th>Date d'expédition</th>
+                        <th>Date de livraison</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for order in orders %}
+                        {% set priority = 0 %}
+
+                        {% if order.goAt is null and order.deliveredAt is null %}
+                            {% set priority = 2 %}
+                        {% elseif order.goAt is not null and order.deliveredAt is null %}
+                            {% set priority = 1 %}
+                        {% else %}
+                            {% set priority = 0 %}
+                        {% endif %}
+                        
+                        <tr style="color: {{ priority == 0 ? 'green' : (priority == 1 ? 'orange' : 'red') }}">
+                            <th>{{ order.id }}</th>
+                            <th>{{ order.user.username }}</th>
+                            <th>
+                                {% if order.createdAt is not null %}
+                                    {{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </th>
+                            <th>
+                                {% if order.goAt is not null %}
+                                    {{ order.goAt | date("d/m/Y") }} à {{ order.goAt | date("H:i") }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </th>
+                            <th>
+                                {% if order.deliveredAt is not null %}
+                                    {{ order.deliveredAt | date("d/m/Y") }} à {{ order.deliveredAt | date("H:i") }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </th>
+                            <th>
+                                {% if order.goAt is null and order.deliveredAt is null %}
+                                    En préparation
+                                {% elseif order.goAt is not null and order.deliveredAt is null %}
+                                    Expédiée
+                                {% else %}
+                                    Finalisée
+                                {% endif %}
+                            </th>
+                            <th><a href="{{ url('view_admin_order', {'id': order.id}) }}">Voir</a></th>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% for i in 1..nbPages %}
+                <a href="{{ url('orders', {'page': i}) }}">{{ i }}</a>
+            {% endfor %}
+        </div>
+
+        <a href="{{ url('add_admin_order') }}">Ajouter une commande</a>
+    </div>
+{% endblock %}

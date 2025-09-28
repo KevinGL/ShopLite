@@ -97,4 +97,22 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByWordsNoPage(array $words): array
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        $orX = $qb->expr()->orX();
+
+        foreach ($words as $i => $word)
+        {
+            $param = ':word' . $i;
+            $orX->add("p.name LIKE $param OR p.description LIKE $param");
+            $qb->setParameter($param, '%' . $word . '%');
+        }
+
+        return $qb->where($orX)
+            ->getQuery()
+            ->getResult();
+    }
 }

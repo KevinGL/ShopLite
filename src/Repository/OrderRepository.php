@@ -51,4 +51,27 @@ class OrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByPage(int $page, int &$nbPages): array
+    {
+        $qb = $this->createQueryBuilder("o");
+
+        $alls = $qb->getQuery()->getResult();
+        $nbPages = ceil(count($alls) / $_ENV["LIMIT_PAGES"]);
+
+        return $this->createQueryBuilder("o")
+            ->addSelect(
+                "CASE 
+                    WHEN o.goAt IS NULL THEN 1 
+                    WHEN o.deliveredAt IS NULL THEN 2 
+                    ELSE 3 
+                END AS HIDDEN priority"
+            )
+            ->orderBy("priority", "ASC")
+            ->addOrderBy("o.createdAt", "DESC")
+            ->setFirstResult(($page - 1) * $_ENV["LIMIT_PAGES"])
+            ->setMaxResults($_ENV["LIMIT_PAGES"])
+            ->getQuery()
+            ->getResult();
+    }
 }
