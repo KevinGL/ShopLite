@@ -19,7 +19,6 @@ class UserType extends AbstractType
             ->add('zipCode')
             ->add('city')
             ->add('phoneNumber')
-            ->add("save", SubmitType::class)
         ;
     }
 

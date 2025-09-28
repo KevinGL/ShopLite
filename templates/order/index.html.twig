@@ -3,81 +3,157 @@
 {% block title %}Liste des commandes{% endblock %}
 
 {% block body %}
-    <div>
-        <div>
-            {% for i in 1..nbPages %}
-                <a href="{{ url('orders', {'page': i}) }}">{{ i }}</a>
-            {% endfor %}
+<div class="max-w-7xl mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">📦 Liste des commandes</h1>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>Client</th>
-                        <th>Date de commande</th>
-                        <th>Date d'expédition</th>
-                        <th>Date de livraison</th>
-                        <th>Statut</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
+    {% set currentPage = page|default(1) %}
 
-                <tbody>
-                    {% for order in orders %}
-                        {% set priority = 0 %}
+    <div class="flex justify-center space-x-2 my-6">
+        {% if currentPage > 1 %}
+            <a href="{{ url('orders', {'page': currentPage - 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ‹
+            </a>
+        {% endif %}
 
-                        {% if order.goAt is null and order.deliveredAt is null %}
-                            {% set priority = 2 %}
-                        {% elseif order.goAt is not null and order.deliveredAt is null %}
-                            {% set priority = 1 %}
-                        {% else %}
-                            {% set priority = 0 %}
-                        {% endif %}
-                        
-                        <tr style="color: {{ priority == 0 ? 'green' : (priority == 1 ? 'orange' : 'red') }}">
-                            <th>{{ order.id }}</th>
-                            <th>{{ order.user.username }}</th>
-                            <th>
-                                {% if order.createdAt is not null %}
-                                    {{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </th>
-                            <th>
-                                {% if order.goAt is not null %}
-                                    {{ order.goAt | date("d/m/Y") }} à {{ order.goAt | date("H:i") }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </th>
-                            <th>
-                                {% if order.deliveredAt is not null %}
-                                    {{ order.deliveredAt | date("d/m/Y") }} à {{ order.deliveredAt | date("H:i") }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </th>
-                            <th>
-                                {% if order.goAt is null and order.deliveredAt is null %}
-                                    En préparation
-                                {% elseif order.goAt is not null and order.deliveredAt is null %}
-                                    Expédiée
-                                {% else %}
-                                    Finalisée
-                                {% endif %}
-                            </th>
-                            <th><a href="{{ url('view_admin_order', {'id': order.id}) }}">Voir</a></th>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {% if currentPage > 3 %}
+            <a href="{{ url('orders', {'page': 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">1</a>
+            <span class="px-2">...</span>
+        {% endif %}
 
-            {% for i in 1..nbPages %}
-                <a href="{{ url('orders', {'page': i}) }}">{{ i }}</a>
-            {% endfor %}
-        </div>
+        {% for i in (currentPage - 2)..(currentPage + 2) %}
+            {% if i > 0 and i <= nbPages %}
+                <a href="{{ url('orders', {'page': i}) }}"
+                class="px-3 py-1 rounded-md border {{ i == currentPage ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-100' }}">
+                    {{ i }}
+                </a>
+            {% endif %}
+        {% endfor %}
 
-        <a href="{{ url('add_admin_order') }}">Ajouter une commande</a>
+        {% if currentPage < nbPages - 2 %}
+            <span class="px-2">...</span>
+            <a href="{{ url('orders', {'page': nbPages}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">{{ nbPages }}</a>
+        {% endif %}
+
+        {% if currentPage < nbPages %}
+            <a href="{{ url('orders', {'page': currentPage + 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ›
+            </a>
+        {% endif %}
     </div>
+
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+        <table class="min-w-full border-collapse">
+            <thead class="bg-gray-100 border-b">
+                <tr class="text-left text-sm font-semibold text-gray-700">
+                    <th class="px-4 py-3">#</th>
+                    <th class="px-4 py-3">Client</th>
+                    <th class="px-4 py-3">Date commande</th>
+                    <th class="px-4 py-3">Expédition</th>
+                    <th class="px-4 py-3">Livraison</th>
+                    <th class="px-4 py-3">Statut</th>
+                    <th class="px-4 py-3 text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 text-sm">
+                {% for order in orders %}
+                    {% if order.goAt is null and order.deliveredAt is null %}
+                        {% set status = 'En préparation' %}
+                        {% set statusColor = 'bg-red-100 text-red-800' %}
+                    {% elseif order.goAt is not null and order.deliveredAt is null %}
+                        {% set status = 'Expédiée' %}
+                        {% set statusColor = 'bg-orange-100 text-orange-800' %}
+                    {% else %}
+                        {% set status = 'Finalisée' %}
+                        {% set statusColor = 'bg-green-100 text-green-800' %}
+                    {% endif %}
+
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ order.id }}</td>
+                        <td class="px-4 py-3">{{ order.user.username }}</td>
+                        <td class="px-4 py-3">
+                            {% if order.createdAt %}
+                                {{ order.createdAt|date("d/m/Y H:i") }}
+                            {% else %}
+                                <span class="text-gray-400">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if order.goAt %}
+                                {{ order.goAt|date("d/m/Y H:i") }}
+                            {% else %}
+                                <span class="text-gray-400">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if order.deliveredAt %}
+                                {{ order.deliveredAt|date("d/m/Y H:i") }}
+                            {% else %}
+                                <span class="text-gray-400">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-md text-xs font-semibold {{ statusColor }}">
+                                {{ status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <a href="{{ url('view_admin_order', {'id': order.id}) }}"
+                               class="text-indigo-600 hover:text-indigo-800 font-medium">
+                                Voir →
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex justify-center space-x-2 my-6">
+        {% if currentPage > 1 %}
+            <a href="{{ url('orders', {'page': currentPage - 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ‹
+            </a>
+        {% endif %}
+
+        {% if currentPage > 3 %}
+            <a href="{{ url('orders', {'page': 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">1</a>
+            <span class="px-2">...</span>
+        {% endif %}
+
+        {% for i in (currentPage - 2)..(currentPage + 2) %}
+            {% if i > 0 and i <= nbPages %}
+                <a href="{{ url('orders', {'page': i}) }}"
+                class="px-3 py-1 rounded-md border {{ i == currentPage ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-100' }}">
+                    {{ i }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if currentPage < nbPages - 2 %}
+            <span class="px-2">...</span>
+            <a href="{{ url('orders', {'page': nbPages}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">{{ nbPages }}</a>
+        {% endif %}
+
+        {% if currentPage < nbPages %}
+            <a href="{{ url('orders', {'page': currentPage + 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ›
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="mt-6 text-right">
+        <a href="{{ url('add_admin_order') }}"
+           class="inline-block bg-indigo-600 text-white px-5 py-2 rounded-lg shadow hover:bg-indigo-700 transition">
+            ➕ Ajouter une commande
+        </a>
+    </div>
+</div>
 {% endblock %}

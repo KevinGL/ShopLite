@@ -3,53 +3,66 @@
 {% block title %}Liste des catégories{% endblock %}
 
 {% block body %}
+<div class="p-6">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">Liste des catégories</h1>
 
-<div>
-    <h1>Liste des catégories</h1>
-
-    <table>
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>Nom</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for cat in categories %}
+    <div class="overflow-x-auto bg-white shadow rounded-lg">
+        <table class="min-w-full text-sm text-left text-gray-600">
+            <thead class="bg-gray-100 text-gray-800 text-xs uppercase">
                 <tr>
-                    <th>{{ cat.id }}</th>
-                    <td>{{ cat.name }}</td>
-                    <td><a href="{{ url('edit_category', {'id': cat.id}) }}">Modifier</a> <button id="{{ cat.id }}" class="delete">Supprimer</button></td>
+                    <th class="px-6 py-3">ID</th>
+                    <th class="px-6 py-3">Nom</th>
+                    <th class="px-6 py-3">Action</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for cat in categories %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-6 py-4">{{ cat.id }}</td>
+                        <td class="px-6 py-4 font-medium">{{ cat.name }}</td>
+                        <td class="px-6 py-4 space-x-3">
+                            <a href="{{ url('edit_category', {'id': cat.id}) }}"
+                               class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                                Modifier
+                            </a>
+                            <button id="{{ cat.id }}" class="delete px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                                Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <a href="{{ url('add_category') }}">Ajouter une catégorie</a>
+    <div class="mt-6">
+        <a href="{{ url('add_category') }}"
+           class="px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 transition">
+            ➕ Ajouter une catégorie
+        </a>
+    </div>
 </div>
 
-<div id="modal" hidden>
-    Confirmer la suppression de la catégorie ?
-    <div>
-        <button id="delete_yes">Oui</button>
-        <button id="delete_no">Non</button>
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirmer la suppression</h2>
+        <p class="text-gray-600 mb-6">Voulez-vous vraiment supprimer cette catégorie ?</p>
+        <div class="flex justify-center space-x-4">
+            <button id="delete_yes"
+                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Oui</button>
+            <button id="delete_no"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Non</button>
+        </div>
     </div>
 </div>
 
 <script>
     const modal = $("#modal");
     let idDelete = "";
-    const buttonsDelete = Array.from($(".delete"));
-
-    buttonsDelete.map((b) =>
+    $(".delete").on("click", function ()
     {
-        $("#" + b.id).click(() =>
-        {
-            idDelete = b.id;
-            modal.show();
-        });
+        idDelete = this.id;
+        modal.removeClass("hidden");
     });
 
     $("#delete_yes").click(() =>
@@ -59,7 +72,7 @@
 
     $("#delete_no").click(() =>
     {
-        modal.hide();
+        modal.addClass("hidden");
     });
 </script>
 {% endblock %}

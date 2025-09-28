@@ -3,23 +3,42 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block body %}
+<div class="max-w-5xl mx-auto p-6 grid md:grid-cols-2 gap-8 bg-white rounded-xl shadow-lg mt-6">
+    <div class="flex items-center justify-center">
+        <img src="{{ product.image }}" alt="{{ product.name }}" class="object-cover rounded-lg shadow-md max-h-96">
+    </div>
 
-<div>
-    <h1>{{ product.name }}</h1>
-    <img src="{{ product.image }}" alt="{{ product.name }}" width="500">
-    <p>
-        {{ product.description }}
-    </p>
-    <div>{{ product.price }} €</div>
-    
-    {% if product.nbCopies > 0 %}
-        <button id="add_cart">Ajouter au panier</button>
-    {% else %}
-        <div>Ce produit n'est plus disponible</div>
-    {% endif %}
+    <div class="flex flex-col justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product.name }}</h1>
+            <p class="text-gray-700 mb-6 leading-relaxed">
+                {{ product.description }}
+            </p>
+            <div class="text-2xl font-semibold text-indigo-600 mb-6">
+                {{ product.price }} €
+            </div>
+        </div>
 
-    <div id="modal" style="display:none;">
-        <div id="message"></div>
+        {% if product.nbCopies > 0 %}
+            <button id="add_cart"
+                    class="w-full py-3 px-6 bg-indigo-600 text-white rounded-lg font-semibold shadow hover:bg-indigo-700 transition">
+                Ajouter au panier
+            </button>
+            <p class="text-sm text-gray-500 mt-2">
+                {{ product.nbCopies }} exemplaire(s) en stock
+            </p>
+        {% else %}
+            <div class="text-red-600 font-semibold">
+                Ce produit n'est plus disponible
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="modal"
+     class="hidden fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg text-center max-w-md w-full">
+        <div id="message" class="text-lg font-semibold text-gray-800 mb-4"></div>
     </div>
 </div>
 
@@ -28,12 +47,12 @@
     {
         $.get("/api/cart/add/{{ product.id }}", (res) =>
         {
-            $("#modal").show();
+            $("#modal").removeClass("hidden").addClass("flex");
             $("#message").text(res.message);
 
             setTimeout(() =>
             {
-                $("#modal").hide();
+                $("#modal").removeClass("flex").addClass("hidden");
             }, 5000);
 
             if(res.success)

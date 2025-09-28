@@ -56,7 +56,6 @@ class ProductType extends AbstractType
                 'choice_label' => 'name',
                 'multiple' => true,
             ])
-            ->add("save", SubmitType::class)
         ;
     }
 

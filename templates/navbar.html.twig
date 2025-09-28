@@ -1,39 +1,112 @@
-<nav style="display: flex">
-    <a href="{{ url('app_shop') }}">ShopLite</a>
-    <form action="{{ url('app_by_search', {'page': 1}) }}" method="get">
-        <input type="text" name="words" />
-        <input type="submit"/>
-    </form>
-    <div id="cart">
-        <img src="/images/Cart.png" alt="cart" width="20" />
-        <span id="count_cart">0</span>
-        <a href="{{ url('view_cart') }}">Voir mon panier</a>
+<nav class="bg-white border-b border-gray-200 shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            
+            <div class="flex-shrink-0">
+                <a href="{{ url('app_shop') }}" class="text-2xl font-bold text-indigo-600 hover:text-indigo-800">
+                    ShopLite
+                </a>
+            </div>
+
+            <div class="hidden md:flex flex-1 mx-4">
+                <form action="{{ url('app_by_search', {'page': 1}) }}" method="get" class="flex w-full">
+                    <input type="text" name="words"
+                           placeholder="Rechercher un produit..."
+                           class="w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-r-md hover:bg-indigo-700 transition">
+                        🔍
+                    </button>
+                </form>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="{{ url('view_cart') }}" class="relative flex items-center text-gray-700 hover:text-indigo-600">
+                    <img src="/images/Cart.png" alt="cart" width="24" class="mr-1"/>
+                    <span id="count_cart"
+                          class="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold rounded-full px-2">
+                        0
+                    </span>
+                    <span class="hidden sm:inline">Panier</span>
+                </a>
+
+                <a href="{{ url('app_profile') }}" class="flex items-center hover:text-indigo-600">
+                    <img src="/images/Profile.png" alt="profile" width="24"/>
+                </a>
+
+                {% if "ROLE_ADMIN" in app.user.roles %}
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ url('app_products', {'page': 1}) }}" class="text-sm font-medium text-gray-700 hover:text-indigo-600">Produits</a>
+                        <a href="{{ url('app_category') }}" class="text-sm font-medium text-gray-700 hover:text-indigo-600">Catégories</a>
+                        <a href="{{ url('orders', {'page': 1}) }}" class="text-sm font-medium text-gray-700 hover:text-indigo-600">Commandes</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="md:hidden">
+                <button id="menu-toggle" class="p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-gray-100">
+                    ☰
+                </button>
+            </div>
+        </div>
     </div>
-    <div>
-        <a href="{{ url('app_profile') }}"><img src="/images/Profile.png" alt="profile" width="20" /></a>
-    </div>
-
-    {% if "ROLE_ADMIN" in app.user.roles %}
-        <div>
-            <a href="{{ url('app_products', {'page': 1}) }}">Gérer les produits</a>
-        </div>
-
-        <div>
-            <a href="{{ url('app_category') }}">Gérer les catégories</a>
-        </div>
-
-        <div>
-            <a href="{{ url('orders', {'page': 1}) }}">Gérer les commandes</a>
-        </div>
-    {% endif %}
 </nav>
 
+<div id="mobile-menu"
+     class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+    <div class="p-4 flex justify-between items-center border-b border-gray-200">
+        <h2 class="text-lg font-bold">Menu</h2>
+        <button id="menu-close" class="text-gray-600 hover:text-red-500">✕</button>
+    </div>
+
+    <div class="p-4">
+        <form action="{{ url('app_by_search', {'page': 1}) }}" method="get" class="flex">
+            <input type="text" name="words"
+                   placeholder="Rechercher..."
+                   class="w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button type="submit"
+                    class="px-3 py-2 bg-indigo-600 text-white font-medium rounded-r-md hover:bg-indigo-700 transition">
+                🔍
+            </button>
+        </form>
+    </div>
+
+    <div class="flex flex-col p-4 space-y-4">
+        <a href="{{ url('view_cart') }}" class="flex items-center text-gray-700 hover:text-indigo-600">
+            🛒 <span class="ml-2">Panier (<span id="count_cart_mobile">0</span>)</span>
+        </a>
+        <a href="{{ url('app_profile') }}" class="flex items-center text-gray-700 hover:text-indigo-600">
+            👤 <span class="ml-2">Profil</span>
+        </a>
+
+        {% if "ROLE_ADMIN" in app.user.roles %}
+            <a href="{{ url('app_products', {'page': 1}) }}" class="text-gray-700 hover:text-indigo-600">Produits</a>
+            <a href="{{ url('app_category') }}" class="text-gray-700 hover:text-indigo-600">Catégories</a>
+            <a href="{{ url('orders', {'page': 1}) }}" class="text-gray-700 hover:text-indigo-600">Commandes</a>
+        {% endif %}
+    </div>
+</div>
+
+<div id="menu-overlay"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+
+<div class="pt-16"></div>
+
 <script>
-    $.get("/api/cart/get_count", (res) =>
-    {
-        if(res.success)
-        {
+    $.get("/api/cart/get_count", (res) => {
+        if(res.success) {
             $("#count_cart").text(res.message);
+            $("#count_cart_mobile").text(res.message);
         }
+    });
+
+    $("#menu-toggle").on("click", () => {
+        $("#mobile-menu").removeClass("translate-x-full").addClass("translate-x-0");
+        $("#menu-overlay").removeClass("hidden");
+    });
+
+    $("#menu-close, #menu-overlay").on("click", () => {
+        $("#mobile-menu").removeClass("translate-x-0").addClass("translate-x-full");
+        $("#menu-overlay").addClass("hidden");
     });
 </script>

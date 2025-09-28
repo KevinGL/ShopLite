@@ -3,18 +3,40 @@
 {% block title %}Votre commande{% endblock %}
 
 {% block body %}
-    <div>
-        <h1>Votre commande</h1>
-        
-        <div>
-            {% for product in products %}
-                <h2>{{ product.product.name }} ({{ product.quantity }}x)</h2>
-                <img src="{{ product.product.image }}" alt="{{ product.product.name }}" width="100" />
-            {% endfor %}
-        </div>
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md mt-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Votre commande</h1>
 
-        <h2>Livraison</h2>
-
-        {{ form(form) }}
+    <div class="space-y-4 mb-8">
+        {% for product in products %}
+            <div class="flex items-center border rounded-lg p-4 shadow-sm bg-gray-50">
+                <img src="{{ product.product.image }}" alt="{{ product.product.name }}" 
+                     class="w-20 h-20 object-cover rounded-md flex-shrink-0">
+                <div class="ml-4 flex-1">
+                    <h2 class="text-lg font-semibold text-gray-800">{{ product.product.name }}</h2>
+                    <p class="text-sm text-gray-600">Quantité : {{ product.quantity }}</p>
+                </div>
+            </div>
+        {% endfor %}
     </div>
+
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Informations de livraison</h2>
+
+    <div class="space-y-4">
+        {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{ form_row(form.address, {'attr': {'class': 'p-2 border rounded w-full'}}) }}
+                {{ form_row(form.zipCode, {'attr': {'class': 'p-2 border rounded w-full'}}) }}
+                {{ form_row(form.city, {'attr': {'class': 'p-2 border rounded w-full'}}) }}
+                {{ form_row(form.phoneNumber, {'attr': {'class': 'p-2 border rounded w-full'}}) }}
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" 
+                        class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition">
+                    Valider ma commande
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
 {% endblock %}

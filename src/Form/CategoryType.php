@@ -15,7 +15,6 @@ class CategoryType extends AbstractType
     {
         $builder
             ->add('name', TextType::class)
-            ->add("save", SubmitType::class)
         ;
     }
 

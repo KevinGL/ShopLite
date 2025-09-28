@@ -1,68 +1,109 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Votre panier{% endblock %}
+{% block title %}Commande #{{ order.id }}{% endblock %}
 
 {% block body %}
-    <div style="display: flex; flex-direction: column;">
-        <div>
-            <h1>Commande passée le {{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }} par {{ order.user.username }}</h1>
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">
+        Commande #{{ order.id }} passée le {{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}
+    </h1>
+    <p class="text-gray-600 mb-6">Client : <span class="font-semibold">{{ order.user.username }}</span></p>
 
-            <h2>
-                Statut :
-
-                {% if order.goAt is null %}
-                    En cours de préparation
-                {% elseif order.goAt is not null and order.deliveredAt is null %}
-                    Expédiée
-                {% elseif order.deliveredAt is not null %}
-                    Livrée
-                {% endif %}
-            </h2>
-
-            <h2>Adresse de livraison</h2>
-
-            <div>
-                <div>{{ order.user.address }}</div>
-                <div>{{ order.user.zipCode }}</div>
-                <div>{{ order.user.city }}</div>
-            </div>
-
-            <h2>Liste des produits</h2>
-
-            {% set totalPrice = 0 %}
-
-            <ul>
-                {% for item in order.orderItems %}
-                    <li><a href="{{ url('view_product', {'id': item.product.id}) }}">{{ item.product.name }}</a></li>
-                    {% set totalPrice = totalPrice + item.unitPrice * item.quantity %}
-                {% endfor %}
-            </ul>
-
-            <h3>{{ totalPrice }} €</h3>
-        </div>
-
-        <a href="{{ url('edit_admin_order', {'id': order.id}) }}">Mettre à jour</a>
-        <button id="delete">Supprimer</button>
-        <a href="{{ url('orders', {'page': 1}) }}">Retour</a>
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold text-gray-700">Statut</h2>
+        <span class="px-3 py-1 rounded-full text-sm font-medium
+            {% if order.goAt is null %}
+                bg-yellow-100 text-yellow-800
+            {% elseif order.goAt is not null and order.deliveredAt is null %}
+                bg-blue-100 text-blue-800
+            {% else %}
+                bg-green-100 text-green-800
+            {% endif %}
+        ">
+            {% if order.goAt is null %}
+                En cours de préparation
+            {% elseif order.goAt is not null and order.deliveredAt is null %}
+                Expédiée
+            {% else %}
+                Livrée
+            {% endif %}
+        </span>
     </div>
 
-    <div id="modal" hidden>
-        Confirmer la suppression de la commande ?
-        <div>
-            <a href="{{ url('delete_admin_order', {'id': order.id}) }}">Oui</a>
-            <button id="abort">Non</button>
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold text-gray-700">Adresse de livraison</h2>
+        <div class="mt-2 text-gray-600">
+            <div>{{ order.user.address }}</div>
+            <div>{{ order.user.zipCode }} {{ order.user.city }}</div>
         </div>
     </div>
 
-    <script>
-        $("#delete").click(() =>
-        {
-            $("#modal").show();
-        });
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold text-gray-700">Produits</h2>
+        <div class="overflow-x-auto mt-3">
+            <table class="min-w-full border border-gray-200 text-sm text-left">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-4 py-2 border">Produit</th>
+                        <th class="px-4 py-2 border">Quantité</th>
+                        <th class="px-4 py-2 border">Prix unitaire</th>
+                        <th class="px-4 py-2 border">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set totalPrice = 0 %}
+                    {% for item in order.orderItems %}
+                        {% set lineTotal = item.unitPrice * item.quantity %}
+                        {% set totalPrice = totalPrice + lineTotal %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-2 border">
+                                <a href="{{ url('view_product', {'id': item.product.id}) }}" 
+                                   class="text-indigo-600 hover:underline">
+                                    {{ item.product.name }}
+                                </a>
+                            </td>
+                            <td class="px-4 py-2 border">{{ item.quantity }}</td>
+                            <td class="px-4 py-2 border">{{ item.unitPrice }} €</td>
+                            <td class="px-4 py-2 border font-semibold">{{ lineTotal }} €</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <h3 class="text-right text-lg font-bold mt-4">Total : {{ totalPrice }} €</h3>
+    </div>
 
-        $("#abort").click(() =>
-        {
-            $("#modal").hide();
-        });
-    </script>
+    <div class="flex space-x-3">
+        <a href="{{ url('edit_admin_order', {'id': order.id}) }}"
+           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Mettre à jour</a>
+        <button id="delete"
+                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Supprimer</button>
+        <a href="{{ url('orders', {'page': 1}) }}"
+           class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Retour</a>
+    </div>
+</div>
+
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirmer la suppression</h2>
+        <p class="text-gray-600 mb-6">Voulez-vous vraiment supprimer cette commande ?</p>
+        <div class="flex justify-center space-x-4">
+            <a href="{{ url('delete_admin_order', {'id': order.id}) }}"
+               class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Oui</a>
+            <button id="abort" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Non</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#delete").click(() =>
+    {
+        $("#modal").removeClass("hidden");
+    });
+
+    $("#abort").click(() =>
+    {
+        $("#modal").addClass("hidden");
+    });
+</script>
 {% endblock %}

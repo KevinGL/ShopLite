@@ -3,75 +3,160 @@
 {% block title %}Liste de tous les produits{% endblock %}
 
 {% block body %}
-    <div>
-        <h1>Liste de tous les produits</h1>
+<div class="p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">📦 Liste de tous les produits</h1>
 
-        {% for i in 1..nbPages %}
-            <a href="{{ url('app_products', {'page': i}) }}">{{ i }}</a>
+    {% set currentPage = page|default(1) %}
+
+    <div class="flex justify-center space-x-2 my-6">
+        {% if currentPage > 1 %}
+            <a href="{{ url('app_products', {'page': currentPage - 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ‹
+            </a>
+        {% endif %}
+
+        {% if currentPage > 3 %}
+            <a href="{{ url('app_products', {'page': 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">1</a>
+            <span class="px-2">...</span>
+        {% endif %}
+
+        {% for i in (currentPage - 2)..(currentPage + 2) %}
+            {% if i > 0 and i <= nbPages %}
+                <a href="{{ url('app_products', {'page': i}) }}"
+                class="px-3 py-1 rounded-md border {{ i == currentPage ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-100' }}">
+                    {{ i }}
+                </a>
+            {% endif %}
         {% endfor %}
 
-        <table>
-            <thead>
+        {% if currentPage < nbPages - 2 %}
+            <span class="px-2">...</span>
+            <a href="{{ url('app_products', {'page': nbPages}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">{{ nbPages }}</a>
+        {% endif %}
+
+        {% if currentPage < nbPages %}
+            <a href="{{ url('app_products', {'page': currentPage + 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ›
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+        <table class="w-full border-collapse">
+            <thead class="bg-gray-200 text-gray-700 uppercase text-sm">
                 <tr>
-                    <th>id</th>
-                    <th>Nom</th>
-                    <th>Prix</th>
-                    <th>Exemplaires</th>
-                    <th>Action</th>
+                    <th class="px-4 py-2 text-left">ID</th>
+                    <th class="px-4 py-2 text-left">Nom</th>
+                    <th class="px-4 py-2 text-left">Prix (€)</th>
+                    <th class="px-4 py-2 text-left">Exemplaires</th>
+                    <th class="px-4 py-2 text-center">Action</th>
                 </tr>
             </thead>
-
             <tbody>
                 {% for product in products %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-2">{{ product.id }}</td>
+                        <td class="px-4 py-2 font-medium text-gray-800">{{ product.name }}</td>
+                        <td class="px-4 py-2">{{ product.price|number_format(2, ',', ' ') }}</td>
+                        <td class="px-4 py-2">{{ product.nbCopies }}</td>
+                        <td class="px-4 py-2 text-center space-x-3">
+                            <a href="{{ url('edit_product', {'id': product.id}) }}"
+                               class="text-blue-600 hover:underline">Modifier</a>
+                            <button id="{{ product.id }}" class="delete text-red-600 hover:underline">Supprimer</button>
+                        </td>
+                    </tr>
+                {% else %}
                     <tr>
-                        <th>{{ product.id }}</th>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.nbCopies }}</td>
-                        <td><a href="{{ url('edit_product', {'id': product.id}) }}">Modifier</a><button id="{{ product.id }}" class="delete">Supprimer</button></td>
+                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">Aucun produit trouvé</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
 
-        {% for i in 1..nbPages %}
-            <a href="{{ url('app_products', {'page': i}) }}">{{ i }}</a>
+    {% set currentPage = page|default(1) %}
+
+    <div class="flex justify-center space-x-2 my-6">
+        {% if currentPage > 1 %}
+            <a href="{{ url('app_products', {'page': currentPage - 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ‹
+            </a>
+        {% endif %}
+
+        {% if currentPage > 3 %}
+            <a href="{{ url('app_products', {'page': 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">1</a>
+            <span class="px-2">...</span>
+        {% endif %}
+
+        {% for i in (currentPage - 2)..(currentPage + 2) %}
+            {% if i > 0 and i <= nbPages %}
+                <a href="{{ url('app_products', {'page': i}) }}"
+                class="px-3 py-1 rounded-md border {{ i == currentPage ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-100' }}">
+                    {{ i }}
+                </a>
+            {% endif %}
         {% endfor %}
 
-        <div>
-            <a href="{{ url('add_product') }}">Ajouter un produit</a>
-        </div>
+        {% if currentPage < nbPages - 2 %}
+            <span class="px-2">...</span>
+            <a href="{{ url('app_products', {'page': nbPages}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">{{ nbPages }}</a>
+        {% endif %}
 
-        <div id="modal" hidden>
-            Confirmation suppression ?
-            <div>
-                <button id="delete_yes">Oui</button>
-                <button id="delete_no">Non</button>
+        {% if currentPage < nbPages %}
+            <a href="{{ url('app_products', {'page': currentPage + 1}) }}"
+            class="px-3 py-1 rounded-md border bg-white text-gray-700 hover:bg-gray-100">
+                ›
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="mt-6">
+        <a href="{{ url('add_product') }}"
+           class="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-600 transition">
+            ➕ Ajouter un produit
+        </a>
+    </div>
+
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
+            <h2 class="text-lg font-bold mb-4">❌ Confirmation suppression</h2>
+            <p class="text-gray-700 mb-6">Voulez-vous vraiment supprimer ce produit ?</p>
+            <div class="flex justify-center gap-4">
+                <button id="delete_yes" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Oui</button>
+                <button id="delete_no" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400">Non</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        const buttonsDelete = Array.from($(".delete"));
-        let idDelete = "";
-        
-        buttonsDelete.map((b) =>
+<script>
+    const buttonsDelete = Array.from($(".delete"));
+    let idDelete = "";
+    
+    buttonsDelete.map((b) =>
+    {
+        $("#" + b.id).click(() =>
         {
-            $("#" + b.id).click(() =>
-            {
-                $("#modal").show();
-                idDelete = b.id;
-            });
+            $("#modal").removeClass("hidden");
+            idDelete = b.id;
         });
+    });
 
-        $("#delete_yes").click(() =>
-        {
-            window.location.href = "/products/delete/" + idDelete;
-        });
+    $("#delete_yes").click(() =>
+    {
+        window.location.href = "/products/delete/" + idDelete;
+    });
 
-        $("#delete_no").click(() =>
-        {
-            $("#modal").hide();
-        });
-    </script>
+    $("#delete_no").click(() =>
+    {
+        $("#modal").addClass("hidden");
+    });
+</script>
 {% endblock %}

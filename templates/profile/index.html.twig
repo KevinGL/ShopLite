@@ -3,59 +3,180 @@
 {% block title %}Bienvenue dans votre espace !{% endblock %}
 
 {% block body %}
-    <div style="display: flex; flex-direction: column;">
-        <div>
-            <h1>Vos coordonnées</h1>
-            {{ form(profileForm) }}
-        </div>
-
-        <div>
-            <h1>Mettre à jour votre mot de passe</h1>
-            {{ form(passwordForm) }}
-        </div>
-
-        <div>
-            <a href="{{ url('app_logout') }}">Se déconnecter</a>
-        </div>
-
-        <div>
-            <button id="delete">Supprimer mon profil</button>
-        </div>
-
-        <div>
-            {% if orders | length > 0 %}
-                <h1>Historique de vos commandes</h1>
+<div class="max-w-5xl mx-auto p-6 space-y-10">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h1 class="text-xl font-semibold text-gray-800 mb-6">📇 Vos coordonnées</h1>
+        
+        {{ form_start(profileForm) }}
+            <div class="space-y-5">
+                <div>
+                    {{ form_label(profileForm.email, 'Email', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(profileForm.email, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                    }}) }}
+                    {{ form_errors(profileForm.email) }}
+                </div>
 
                 <div>
-                    {% for order in orders %}
-                        <div>
-                            <a href="{{ url('view_order', {'id': order.id}) }}">{{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}</a>
-                        </div>
-                    {% endfor %}
+                    {{ form_label(profileForm.username, 'Nom utilisateur', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(profileForm.username, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                    }}) }}
+                    {{ form_errors(profileForm.username) }}
                 </div>
-            {% else %}
+
                 <div>
-                    <h1>Vous n'avez pas encore de commandes</h1>
+                    {{ form_label(profileForm.address, 'Adresse', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(profileForm.address, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                    }}) }}
+                    {{ form_errors(profileForm.address) }}
                 </div>
-            {% endif %}
-        </div>
+
+                <div>
+                    {{ form_label(profileForm.zipCode, 'Code postal', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(profileForm.zipCode, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                    }}) }}
+                    {{ form_errors(profileForm.zipCode) }}
+                </div>
+
+                <div>
+                    {{ form_label(profileForm.city, 'Ville', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(profileForm.city, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                    }}) }}
+                    {{ form_errors(profileForm.city) }}
+                </div>
+
+                <div>
+                    {{ form_label(profileForm.phoneNumber, 'Téléphone', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(profileForm.phoneNumber, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                    }}) }}
+                    {{ form_errors(profileForm.phoneNumber) }}
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-md">
+                        Mettre à jour
+                    </button>
+                </div>
+            </div>
+        {{ form_end(profileForm) }}
     </div>
 
-    <div id="modal" hidden>
-        Veuillez entrer votre mot de passe pour supprimer votre profil
-        {{ form(deleteProfileForm) }}
-        <button id="abort">Annuler</button>
+    <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+        <h1 class="text-xl font-semibold text-gray-800 mb-6">🔑 Mettre à jour votre mot de passe</h1>
+
+        {{ form_start(passwordForm) }}
+            <div class="space-y-5">
+                <div>
+                    {{ form_label(passwordForm.old_password, 'Mot de passe actuel', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(passwordForm.old_password, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                    }}) }}
+                    {{ form_errors(passwordForm.old_password) }}
+                </div>
+
+                <div>
+                    {{ form_label(passwordForm.new_password, 'Nouveau mot de passe', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(passwordForm.new_password, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                    }}) }}
+                    {{ form_errors(passwordForm.new_password) }}
+                </div>
+
+                <div>
+                    {{ form_label(passwordForm.confirm_password, 'Confirmer le nouveau mot de passe', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(passwordForm.confirm_password, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                    }}) }}
+                    {{ form_errors(passwordForm.confirm_password) }}
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 shadow-md">
+                        Changer le mot de passe
+                    </button>
+                </div>
+            </div>
+        {{ form_end(passwordForm) }}
     </div>
 
-    <script>
-        $("#delete").click(() =>
-        {
-            $("#modal").show();
-        });
+    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow">
+        <a href="{{ url('app_logout') }}" class="text-red-600 font-medium hover:underline">
+            🚪 Se déconnecter
+        </a>
+        <button id="delete" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+            Supprimer mon profil
+        </button>
+    </div>
 
-        $("#abort").click(() =>
-        {
-            $("#modal").hide();
-        });
-    </script>
+    <div class="bg-white shadow-md rounded-lg p-6">
+        {% if orders | length > 0 %}
+            <h1 class="text-xl font-semibold text-gray-800 mb-4">📦 Historique de vos commandes</h1>
+            <ul class="divide-y divide-gray-200">
+                {% for order in orders %}
+                    <li class="py-2">
+                        <a href="{{ url('view_order', {'id': order.id}) }}" 
+                           class="text-indigo-600 hover:underline">
+                            Commande du {{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <h1 class="text-lg text-gray-600">Vous n'avez pas encore de commandes</h1>
+        {% endif %}
+    </div>
+</div>
+
+<div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">⚠️ Supprimer votre profil</h2>
+        <p class="text-sm text-gray-600 mb-6">Veuillez entrer votre mot de passe pour confirmer la suppression.</p>
+        
+        {{ form_start(deleteProfileForm) }}
+            <div class="space-y-4">
+                <div>
+                    {{ form_label(deleteProfileForm.password, 'Mot de passe', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(deleteProfileForm.password, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    }}) }}
+                    {{ form_errors(deleteProfileForm.password) }}
+                </div>
+
+                <div>
+                    {{ form_label(deleteProfileForm.confirm_password, 'Confirmer le mot de passe', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(deleteProfileForm.confirm_password, {'attr': {
+                        'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    }}) }}
+                    {{ form_errors(deleteProfileForm.confirm_password) }}
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-between">
+                <button id="abort" type="button" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+                    Annuler
+                </button>
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 shadow-md">
+                    Supprimer définitivement
+                </button>
+            </div>
+        {{ form_end(deleteProfileForm) }}
+    </div>
+</div>
+
+<script>
+    $("#delete").click(() =>
+    {
+        $("#modal").removeClass("hidden");
+    });
+
+    $("#abort").click(() =>
+    {
+        $("#modal").addClass("hidden");
+    });
+</script>
 {% endblock %}

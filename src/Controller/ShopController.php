@@ -54,7 +54,8 @@ final class ShopController extends AbstractController
         [
             "cat" => $cat,
             "products" => $products,
-            "nbPages" => $nbPages
+            "nbPages" => $nbPages,
+            "page" => $page
         ]);
     }
 
@@ -77,7 +78,8 @@ final class ShopController extends AbstractController
         [
             "products" => $products,
             "words" => $req->get("words"),
-            "nbPages" => $nbPages
+            "nbPages" => $nbPages,
+            "page" => $page
         ]);
     }
 

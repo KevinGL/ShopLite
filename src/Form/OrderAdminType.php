@@ -28,10 +28,11 @@ class OrderAdminType extends AbstractType
                 "constraints" =>
                 [
                     new NotBlank(['message' => 'Veuillez entrer une date'])
-                ]
+                ],
+                "label" => "Date de lancement"
             ])
-            ->add('goAt', DateType::class, ["required" => false])
-            ->add('deliveredAt', DateType::class, ["required" => false])
+            ->add('goAt', DateType::class, ["required" => false, "label" => "Date d'expédition"])
+            ->add('deliveredAt', DateType::class, ["required" => false, "label" => "Date de livraison"])
             ->add('userInput', TextType::class,
             [
                 "attr" => ["list" => "list_users"],
@@ -39,18 +40,47 @@ class OrderAdminType extends AbstractType
                 "constraints" =>
                 [
                     new NotBlank(['message' => 'Veuillez sélectionner un client'])
-                ]
+                ],
+                "label" => "Client"
             ])
-            ->add("address", TextType::class)
-            ->add("zipCode", TextType::class)
-            ->add("city", TextType::class)
-            ->add("phoneNumber", TextType::class)
+            ->add("address", TextType::class,
+            [
+                "constraints" =>
+                [
+                    new NotBlank(['message' => 'Veuillez entrer une adresse de livraison'])
+                ],
+                "label" => "Adresse"
+            ])
+            ->add("zipCode", TextType::class,
+            [
+                "constraints" =>
+                [
+                    new NotBlank(['message' => 'Veuillez entrer un code postal'])
+                ],
+                "label" => "Code postal"
+            ])
+            ->add("city", TextType::class,
+            [
+                "constraints" =>
+                [
+                    new NotBlank(['message' => 'Veuillez indiquer une ville'])
+                ],
+                "label" => "Ville"
+            ])
+            ->add("phoneNumber", TextType::class,
+            [
+                "constraints" =>
+                [
+                    new NotBlank(['message' => 'Veuillez indiquer un numéro de téléphone'])
+                ],
+                "label" => "Numéro de téléphone"
+            ])
             ->add("selectProducts", HiddenType::class,
             [
                 'mapped' => false,
                 "attr" => ["id" => "select_products"],
             ])
-            ->add("save", SubmitType::class)
+            ->add("save", SubmitType::class, ["label" => "Enregistrer"])
         ;
     }
 

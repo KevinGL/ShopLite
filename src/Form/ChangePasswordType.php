@@ -44,10 +44,6 @@ class ChangePasswordType extends AbstractType
                 'label' => 'Confirmez le mot de passe',
                 'mapped' => false,
             ])
-            ->add('save', SubmitType::class,
-            [
-                'label' => 'Mettre à jour',
-            ]);
         ;
     }
 

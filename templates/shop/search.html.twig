@@ -1,37 +1,67 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Recherche de "{{words}}"{% endblock %}
+{% block title %}Recherche de "{{ words }}"{% endblock %}
 
 {% block body %}
+<div class="p-6">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">
+        Résultats pour « {{ words }} »
+    </h1>
 
-<div>
-    <h1>Recherche de "{{words}}"</h1>
+    {% if products|length == 0 %}
+        <div class="text-center text-gray-600 text-lg">
+            Aucun résultat trouvé pour <span class="font-semibold">"{{ words }}"</span>.
+        </div>
+    {% else %}
 
-    {% if products | length == 0 %}
-        <div>
-            Aucun résultat
+        <div class="flex justify-center space-x-2 mb-6">
+            {% for i in 1..nbPages %}
+                <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}"
+                   class="px-3 py-1 rounded-lg border border-gray-300 hover:bg-indigo-600 hover:text-white transition
+                          {% if i == page|default(1) %} bg-indigo-600 text-white {% endif %}">
+                    {{ i }}
+                </a>
+            {% endfor %}
         </div>
 
-    {% else %}
-        {% for i in 1..nbPages %}
-            <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
-        {% endfor %}
-
-        <div style="display: flex; flex-wrap: wrap; justify-content: space-evenly;">
+        <div class="flex flex-wrap justify-center gap-6">
             {% for product in products %}
-                <div>
-                    <h2>{{ product.name }}</h2>
-                    <img src="{{ product.image }}" alt="{{ product.name }}" width="500">
-                    <div>
-                        <a href="{{ url('view_product', {'id': product.id}) }}">Voir</a>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition transform hover:-translate-y-1 min-w-[250px] max-w-sm flex-1">
+
+                    <div class="w-full h-56 bg-gray-100 flex items-center justify-center overflow-hidden">
+                        <img src="{{ product.image }}"
+                             alt="{{ product.name }}"
+                             class="object-cover w-full h-full">
+                    </div>
+
+                    <div class="p-4 flex flex-col justify-between h-40">
+                        <h2 class="text-lg font-semibold text-gray-800 truncate">
+                            {{ product.name }}
+                        </h2>
+
+                        <div class="mt-2 flex justify-between items-center">
+                            <span class="text-indigo-600 font-bold text-xl">
+                                {{ product.price }} €
+                            </span>
+                            <a href="{{ url('view_product', {'id': product.id}) }}"
+                               class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition">
+                                Voir
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
 
-        {% for i in 1..nbPages %}
-            <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}">{{ i }}</a>
-        {% endfor %}
+        <div class="flex justify-center space-x-2 mt-6">
+            {% for i in 1..nbPages %}
+                <a href="{{ url('app_by_search', {'page': i, 'words': words}) }}"
+                   class="px-3 py-1 rounded-lg border border-gray-300 hover:bg-indigo-600 hover:text-white transition
+                          {% if i == page|default(1) %} bg-indigo-600 text-white {% endif %}">
+                    {{ i }}
+                </a>
+            {% endfor %}
+        </div>
     {% endif %}
 </div>
 {% endblock %}

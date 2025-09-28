@@ -32,7 +32,6 @@ class DeleteProfileType extends AbstractType
                     new NotBlank(['message' => 'Veuillez entrer un nom d\'utilisateur'])
                 ]
             ])
-            ->add("save", SubmitType::class)
         ;
     }
 

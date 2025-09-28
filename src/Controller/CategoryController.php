@@ -97,7 +97,7 @@ final class CategoryController extends AbstractController
             return $this->redirectToRoute("app_category");
         }
 
-        return $this->render("category/add.html.twig",
+        return $this->render("category/edit.html.twig",
         [
             "form" => $form
         ]);

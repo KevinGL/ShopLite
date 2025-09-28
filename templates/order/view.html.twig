@@ -1,38 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Votre panier{% endblock %}
+{% block title %}Détail de votre commande{% endblock %}
 
 {% block body %}
-    <div style="display: flex; flex-direction: column;">
-        <div>
-            <h1>Commande passée le {{ order.createdAt | date("d/m/Y") }} à {{ order.createdAt | date("H:i") }}</h1>
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md mt-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-4">
+        Commande du {{ order.createdAt|date("d/m/Y") }} à {{ order.createdAt|date("H:i") }}
+    </h1>
 
-            <h2>
-                Statut :
-
-                {% if order.goAt is null %}
-                    En cours de préparation
-                {% elseif order.goAt is not null and order.deliveredAt is null %}
-                    Expédiée
-                {% elseif order.deliveredAt is not null %}
-                    Livrée
-                {% endif %}
-            </h2>
-
-            <h2>Liste des produits</h2>
-
-            {% set totalPrice = 0 %}
-
-            <ul>
-                {% for item in order.orderItems %}
-                    <li><a href="{{ url('view_product', {'id': item.product.id}) }}">{{ item.product.name }}</a></li>
-                    {% set totalPrice = totalPrice + item.unitPrice * item.quantity %}
-                {% endfor %}
-            </ul>
-
-            <h3>{{ totalPrice }} €</h3>
-        </div>
-
-        <a href="{{ url('app_profile') }}">Retour sur votre profil</a>
+    <div class="mb-6">
+        <span class="font-semibold">Statut :</span>
+        {% if order.goAt is null %}
+            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">En cours de préparation</span>
+        {% elseif order.goAt is not null and order.deliveredAt is null %}
+            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Expédiée</span>
+        {% elseif order.deliveredAt is not null %}
+            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Livrée</span>
+        {% endif %}
     </div>
+
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Produits</h2>
+
+    {% set totalPrice = 0 %}
+    <div class="space-y-4 mb-6">
+        {% for item in order.orderItems %}
+            <div class="flex items-center border rounded-lg p-4 shadow-sm bg-gray-50">
+                <img src="{{ item.product.image }}" alt="{{ item.product.name }}"
+                     class="w-20 h-20 object-cover rounded-md flex-shrink-0">
+                <div class="ml-4 flex-1">
+                    <a href="{{ url('view_product', {'id': item.product.id}) }}"
+                       class="text-lg font-semibold text-gray-900 hover:underline">
+                        {{ item.product.name }}
+                    </a>
+                    <p class="text-sm text-gray-600">Quantité : {{ item.quantity }}</p>
+                    <p class="text-sm text-gray-600">Prix unitaire : {{ item.unitPrice }} €</p>
+                </div>
+                <div class="text-right font-semibold text-gray-800">
+                    {{ item.unitPrice * item.quantity }} €
+                </div>
+            </div>
+            {% set totalPrice = totalPrice + item.unitPrice * item.quantity %}
+        {% endfor %}
+    </div>
+
+    <div class="flex justify-between items-center border-t pt-4">
+        <span class="text-xl font-bold text-gray-900">Total :</span>
+        <span class="text-xl font-bold text-indigo-600">{{ totalPrice }} €</span>
+    </div>
+
+    <div class="mt-6">
+        <a href="{{ url('app_profile') }}"
+           class="inline-block px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+            ← Retour à votre profil
+        </a>
+    </div>
+</div>
 {% endblock %}
