@@ -145,7 +145,7 @@ final class OrderController extends AbstractController
     }
 
     #[Route('/order/add_admin', name: 'add_admin_order')]
-    public function addAdmin(Request $req, UserRepository $userRepo, ProductRepository $prodRepo, CategoryRepository $catRepo, EntityManagerInterface $em): Response
+    public function addAdmin(Request $req, UserRepository $userRepo, ProductRepository $prodRepo, EntityManagerInterface $em): Response
     {
         if(!$this->getUser())
         {
@@ -207,5 +207,106 @@ final class OrderController extends AbstractController
             "form" => $form,
             "users" => $users
         ]);
+    }
+
+    #[Route('/order/edit_admin/{id}', name: 'edit_admin_order')]
+    public function editAdmin(Request $req, UserRepository $userRepo, ProductRepository $prodRepo, OrderRepository $orderRepo, int $id, EntityManagerInterface $em): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+
+        if(!in_array("ROLE_ADMIN", $this->getUser()->getRoles()))
+        {
+            $this->addFlash("error", "Cette page est réservée aux admins");
+            return $this->redirectToRoute("app_shop");
+        }
+
+        $users = $userRepo->findAll();
+        
+        $order = $orderRepo->find($id);
+
+        $form = $this->createForm(OrderAdminType::class, $order);
+        $form->handleRequest($req);
+
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $username = $form->get("userInput")->getData();
+            $user = $userRepo->findOneBy(["username" => $username]);
+
+            if(!$user)
+            {
+                $this->addFlash("error", "Client introuvable");
+                return $this->redirectToRoute("orders");
+            }
+
+            $selectedIds = $form->get("selectProducts")->getData();
+
+            $idsProd = explode(",", $selectedIds);
+
+            foreach($idsProd as $idProd)
+            {
+                $product = $prodRepo->find($idProd);
+                $orderItem = new OrderItem();
+
+                if (!$order->getOrderItems()->contains($orderItem))
+                {
+                    $orderItem->setProduct($product)
+                        ->setQuantity(1)
+                        ->setUnitPrice($product->getPrice());
+                    
+                    $order->addOrderItem($orderItem);
+                }
+            }
+
+            foreach ($order->getOrderItems() as $item)
+            {
+                if(!in_array($item->getProduct()->getId(), $idsProd))
+                {
+                    $order->removeOrderItem($item);
+                }
+            }
+            
+            $order->setUser($user);
+            
+            $em->persist($order);
+            $em->flush();
+
+            $this->addFlash("success", "Commande mise à jour");
+
+            return $this->redirectToRoute("orders", ["page" => 1]);
+        }
+        
+        return $this->render('order/edit_admin.html.twig',
+        [
+            "form" => $form,
+            "users" => $users,
+            "order" => $order
+        ]);
+    }
+
+    #[Route("/order/delete_admin/{id}", name: "delete_admin_order")]
+    public function deleteAdmin(OrderRepository $repo, int $id, EntityManagerInterface $em): Response
+    {
+        if(!$this->getUser())
+        {
+            return $this->redirectToRoute("app_home");
+        }
+
+        if(!in_array("ROLE_ADMIN", $this->getUser()->getRoles()))
+        {
+            $this->addFlash("error", "Cette page est réservée aux admins");
+            return $this->redirectToRoute("app_shop");
+        }
+
+        $order = $repo->find($id);
+
+        $em->remove($order);
+        $em->flush();
+
+        $this->addFlash("success", "Commande supprimée");
+
+        return $this->redirectToRoute("orders", ["page" => 1]);
     }
 }

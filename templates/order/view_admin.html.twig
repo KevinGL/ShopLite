@@ -41,6 +41,28 @@
             <h3>{{ totalPrice }} €</h3>
         </div>
 
+        <a href="{{ url('edit_admin_order', {'id': order.id}) }}">Mettre à jour</a>
+        <button id="delete">Supprimer</button>
         <a href="{{ url('orders', {'page': 1}) }}">Retour</a>
     </div>
+
+    <div id="modal" hidden>
+        Confirmer la suppression de la commande ?
+        <div>
+            <a href="{{ url('delete_admin_order', {'id': order.id}) }}">Oui</a>
+            <button id="abort">Non</button>
+        </div>
+    </div>
+
+    <script>
+        $("#delete").click(() =>
+        {
+            $("#modal").show();
+        });
+
+        $("#abort").click(() =>
+        {
+            $("#modal").hide();
+        });
+    </script>
 {% endblock %}

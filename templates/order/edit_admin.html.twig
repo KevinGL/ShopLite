@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mettre à jour une commande{% endblock %}
+
+{% block body %}
+    <div>
+        <datalist id="list_users">
+            {% for user in users %}
+                <option value="{{ user.username }}"></option>
+            {% endfor %}
+        </datalist>
+
+        {{ form_start(form) }}
+            {{ form_row(form.createdAt) }}
+            {{ form_row(form.userInput, {"attr": {"value": order.user.username }}) }}
+
+            <h3>Recherche produit par mot-clé</h3>
+            <input type="text" id="search_product" />
+            <select name="select_products" id="select_products" multiple>
+                {% for item in order.orderItems %}
+                    <option value="{{ item.product.id }}" selected>{{ item.product.name }}</option>
+                {% endfor %}
+            </select>
+
+            {{ form_row(form.selectProducts) }}
+
+            {{ form_row(form.save) }}
+        {{ form_end(form) }}
+
+    </div>
+
+    <script>
+    
+    $("#search_product").on("input", (e) =>
+    {
+        $.get("/api/products/search_by_word/" + e.target.value, (res) =>
+        {
+            if(res.message && res.message.length < 50)
+            {
+                $("#order_admin_selectProducts").show();
+
+                res.message.map((p) =>
+                {
+                    const o = new Option(p.name, p.id);
+                    $(o).html(p.name);
+
+                    if ($("#select_products option[value='" + p.id + "']").length === 0)
+                    {
+                        const o = new Option(p.name, p.id);
+                        $("#select_products").append(o);
+                    }
+                });
+            }
+
+            else
+            {
+                $("#order_admin_selectProducts").hide();
+            }
+        });
+    });
+
+    $("#select_products").change((e) =>
+    {
+        const selectedValues = $("#select_products").val();
+
+        $("#order_admin_selectProducts").val(selectedValues);
+    });
+
+    </script>
+{% endblock %}
